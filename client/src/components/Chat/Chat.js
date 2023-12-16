@@ -1,40 +1,64 @@
 import { useState, useEffect } from 'react'
 import queryString from 'query-string'
 import { useLocation } from 'react-router-dom'
-import {io} from 'socket.io-client'
+import { io } from 'socket.io-client'
 import './chat.css'
+import InfoBar from '../InfoBar/InfoBar.jsx'
+import Input from '../Input/Input.jsx'
 
 let socket;
 
 const Chat = () => {
   const [name, Setname] = useState('');
   const [room, Setroom] = useState('');
+  const [message, Setmessage] = useState([]);
+  const [messages, Setmessages] = useState([]);
   const location = useLocation();
   const ENDPOINT = 'localhost:5000'
 
- useEffect(()=>{
-  const { name, room } = queryString.parse(location.search)
- socket = io(ENDPOINT);
+  useEffect(() => {
+    const { name, room } = queryString.parse(location.search)
+    socket = io(ENDPOINT);
 
     Setname(name)
     Setroom(room)
 
     console.log(socket)
 
-    socket.emit('join',{name,room},)
-    
-return()=>{
-  socket.emit('disconnect');
-  socket.off();
-}
+    socket.emit('join', { name, room }, () => {
 
- },[ENDPOINT,location.search])
- 
-  //ensures that useEffect only takes place when any of the values(as specified inside ) changes.
+    })
+
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    }
+
+  }, [ENDPOINT, location.search])   //ensures that useEffect only takes place when any of the values(as specified inside ) changes.
+
+  useEffect(() => {
+    socket.on('message', (message) => {
+      Setmessages([...messages, message])
+    })
+  }, [messages])
+
+  //function for sending messages
+
+  const sendMessage = (event) => {
+    event.preventDefault();
+    if (message) {
+      socket.emit('sendMessage', message, () => sendMessage(''))
+    }
+  }
+
+  console.log(message, messages);
 
   return (
-    <div>
-      <h1>Chat</h1>
+    <div className='outerContainer'>
+      <div className='container'>
+        <InfoBar room={room} />
+        <Input Setmessage={Setmessage} message={message} sendMessage={sendMessage}/>
+      </div>
     </div>
   )
 }
