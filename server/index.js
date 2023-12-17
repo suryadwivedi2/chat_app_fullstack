@@ -14,13 +14,12 @@ const { addUser, getUser, removeUser, getUsersInRoom } = require('./users.js')
 const io = socketio(server, { cors: { origin: "*" } })
 
 
-
-
 io.on('connection', (socket) => {
     console.log(`we have a new connection`)
 
     socket.on('join', ({ name, room }, cb) => {
-        const { error, user } = addUser({ id: socket.id, name, room })
+        const { error, user } = addUser({ id: socket.id, name: name, room })
+        //console.log(user)
 
         if (error) {
             return cb(error)
@@ -33,9 +32,10 @@ io.on('connection', (socket) => {
         cb();
     })
 
-    socket.on('addMessage', (message, callback) => {
-        const user = getUser(user.id)
-        io.to(user.room).emit('message',{ user:user.name,text: message})
+    socket.on('sendMessage', (message, callback) => {
+        let user = getUser(socket.id)
+        console.log(user)
+        io.to(user.room).emit('message', { user: user.name, text: message })
         callback()
     })
     socket.on('disconnect', () => {

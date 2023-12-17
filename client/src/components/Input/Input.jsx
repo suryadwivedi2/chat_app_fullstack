@@ -4,7 +4,7 @@ import './Input.css'
 
 const Input = ({ sendMessage, Setmessage, message }) => {
     return (
-        <form className='form' action="">
+        <form className='form' onSubmit={(event) => sendMessage(event)}>
             <input
                 className='input'
                 type="text"
@@ -15,7 +15,7 @@ const Input = ({ sendMessage, Setmessage, message }) => {
                 Send
             </button>
         </form>
-    )
+    ) 
 }
 
 export default Input

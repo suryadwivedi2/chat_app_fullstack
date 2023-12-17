@@ -5,6 +5,7 @@ import { io } from 'socket.io-client'
 import './chat.css'
 import InfoBar from '../InfoBar/InfoBar.jsx'
 import Input from '../Input/Input.jsx'
+import Messages from '../Messages/messages.jsx'
 
 let socket;
 
@@ -44,8 +45,8 @@ const Chat = () => {
 
   //function for sending messages
 
-  const sendMessage = (event) => {
-    event.preventDefault();
+  const sendMessage = async (event) => {
+    await event.preventDefault();
     if (message) {
       socket.emit('sendMessage', message, () => sendMessage(''))
     }
@@ -57,7 +58,8 @@ const Chat = () => {
     <div className='outerContainer'>
       <div className='container'>
         <InfoBar room={room} />
-        <Input Setmessage={Setmessage} message={message} sendMessage={sendMessage}/>
+        <Messages  messages={messages} name={name}/>
+        <Input Setmessage={Setmessage} message={message} sendMessage={sendMessage} />
       </div>
     </div>
   )
